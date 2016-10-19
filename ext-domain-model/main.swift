@@ -18,12 +18,33 @@ open class TestMe {
     }
 }
 
+protocol CustomStringConvertible {
+    var description: String { get }
+}
+
+protocol Mathematics {
+    func add(_ other: Money) -> Money
+    func subtract(_ other: Money) -> Money
+}
+
+extension Double {
+    var USD: Money { return Money(amount: Int(self), currency: "USD") }
+    var EUR: Money { return Money(amount: Int(self), currency: "EUR") }
+    var GBP: Money { return Money(amount: Int(self), currency: "GBP") }
+    var YEN: Money { return Money(amount: Int(self), currency: "YEN") }
+}
+
 ////////////////////////////////////
 // Money
 //
-public struct Money {
+public struct Money: CustomStringConvertible, Mathematics {
+
     public var amount : Int
     public var currency : String
+    
+    var description: String {
+        return ("\(currency)\(Double(amount))")
+    }
     
     public func convert(_ to: String) -> Money {
         let startingCurrency : String = self.currency
@@ -77,9 +98,13 @@ public struct Money {
 ////////////////////////////////////
 // Job
 //
-open class Job {
+open class Job: CustomStringConvertible {
     fileprivate var title : String
     fileprivate var type : JobType
+    
+    var description: String {
+        return ("\(title) position, \(type) pay")
+    }
     
     public enum JobType {
         case Hourly(Double)
@@ -113,10 +138,28 @@ open class Job {
 ////////////////////////////////////
 // Person
 //
-open class Person {
+open class Person: CustomStringConvertible {
     open var firstName : String = ""
     open var lastName : String = ""
     open var age : Int = 0
+    
+    var description: String {
+        var result : String = "\(firstName) \(lastName), age: \(age)"
+        
+        if ((self._job) != nil) {
+            result += ", job: \(self._job!.description)"
+        } else {
+            result += ", job: Unemployed"
+        }
+        
+        if ((self._spouse) != nil) {
+            result += ", spouse: \(self._spouse!.firstName) \(self._spouse!.lastName)"
+        } else {
+            result += ", spouse: none"
+        }
+        
+        return result
+    }
     
     fileprivate var _job : Job? = nil
     open var job : Job? {
@@ -156,8 +199,20 @@ open class Person {
 ////////////////////////////////////
 // Family
 //
-open class Family {
+open class Family: CustomStringConvertible {
     fileprivate var members : [Person] = []
+    
+    var description: String {
+        var result : String = "Family members: "
+        if (members.count > 0) {
+            for member in members {
+                result += "\n  \(member.description)"
+            }
+        } else {
+            result += "none"
+        }
+        return result
+    }
     
     public init(spouse1: Person, spouse2: Person) {
         if (spouse1.age >= 21 || spouse2.age >= 21) {
