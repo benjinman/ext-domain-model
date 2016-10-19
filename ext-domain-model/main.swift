@@ -71,8 +71,6 @@ public struct Money: CustomStringConvertible, Mathematics {
                 }
             }
         }
-        /*self.amount = amountCopy
-         self.currency = to*/
         return Money(amount: amountCopy, currency: to)
     }
     
@@ -103,7 +101,14 @@ open class Job: CustomStringConvertible {
     fileprivate var type : JobType
     
     var description: String {
-        return ("\(title) position, \(type) pay")
+        var result : String = "\(title) position, "
+        switch self.type {
+        case .Hourly(let hourly):
+            result += "\(hourly) hourly pay"
+        case .Salary(let annual):
+            result += "\(annual) annual pay"
+        }
+        return (result)
     }
     
     public enum JobType {
@@ -144,21 +149,7 @@ open class Person: CustomStringConvertible {
     open var age : Int = 0
     
     var description: String {
-        var result : String = "\(firstName) \(lastName), age: \(age)"
-        
-        if ((self._job) != nil) {
-            result += ", job: \(self._job!.description)"
-        } else {
-            result += ", job: Unemployed"
-        }
-        
-        if ((self._spouse) != nil) {
-            result += ", spouse: \(self._spouse!.firstName) \(self._spouse!.lastName)"
-        } else {
-            result += ", spouse: none"
-        }
-        
-        return result
+        return toString()
     }
     
     fileprivate var _job : Job? = nil
@@ -192,7 +183,20 @@ open class Person: CustomStringConvertible {
     }
     
     open func toString() -> String {
-        return "[Person: firstName:\(self.firstName) lastName:\(self.lastName) age:\(self.age) job:\(job) spouse:\(spouse)]"
+        var result : String = "[Person: firstName:\(self.firstName) lastName:\(self.lastName) age:\(self.age) job:"
+        if (job != nil) {
+            result += "\(job!.description)"
+        } else {
+            result += "nil"
+        }
+        
+        result += " spouse:"
+        if (spouse != nil) {
+            result += "\(spouse!.firstName)]"
+        } else {
+            result += "nil]"
+        }
+        return result
     }
 }
 
